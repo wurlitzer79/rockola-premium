@@ -1260,7 +1260,8 @@
         function lanzarPeli(url, titulo) {
             isError = false;
             video.src = url;
-            document.getElementById('peli-title-display').innerText = titulo;
+         // document.getElementById('peli-title-display').innerText = titulo;
+			document.getElementById('peli-title-display').innerText = titulo.split('<br>')[0];
             playerBox.style.display = 'flex';
             
             // Mostrar cargando
@@ -1332,3 +1333,4 @@
 </body>
 
 </html>
+
