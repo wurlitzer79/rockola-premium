@@ -1,0 +1,193 @@
+
+        :root {
+            --primary: #e50914;
+            --bg: #050505;
+            --sidebar-bg: #101010;
+            --card-bg: #1a1a1a;
+            --text: #ffffff;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- MENÚ LATERAL CON SCROLL --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 0;
+            z-index: 100;
+            border-right: 1px solid #222;
+            
+            /* Lógica de Scroll */
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Personalización del Scrollbar para el Menú */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .logo-container {
+            padding: 0 30px 40px;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 1px;
+            text-align: center;
+            flex-shrink: 0; /* Evita que el logo se encoja al scrollear */
+        }
+
+        .menu-titulo {
+            padding: 0 30px 10px;
+            font-size: 11px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            flex-shrink: 0;
+        }
+
+        .lista-categorias { list-style: none; flex-grow: 1; }
+
+        .categoria-item {
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 15px;
+            color: #999;
+        }
+
+        .categoria-item:hover, .categoria-item.activa {
+            background-color: rgba(229, 9, 20, 0.1);
+            color: white;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content {
+            margin-left: 260px;
+            flex-grow: 1;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        #titulo-seccion { font-size: 32px; margin-bottom: 30px; font-weight: 700; }
+
+        .rejilla-peliculas {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+        }
+
+        .tarjeta-pelicula {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .tarjeta-pelicula:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+        }
+
+        .imagen-pelicula { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+
+        .info-pelicula { padding: 12px; text-align: center; background: #151515; }
+
+        .titulo-peli { font-size: 13px; font-weight: 500; color: #ddd; }
+
+        /* --- REPRODUCTOR --- */
+        .reproductor {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: none; /* Oculta el puntero en el reproductor */
+        }
+
+        .reproductor.show-controls { cursor: default; }
+
+        #video-player { width: 100%; height: 100%; }
+
+        .ui-video {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.8) 100%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        .reproductor.show-controls .ui-video { opacity: 1; pointer-events: auto; }
+
+        .btn-cerrar {
+            align-self: flex-end;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-cerrar:hover { background: var(--primary); }
+
+        .controles-inferiores { width: 100%; max-width: 900px; margin: 0 auto; }
+
+        .barra-progreso { width: 100%; height: 6px; accent-color: var(--primary); cursor: pointer; }
+
+        .botones-flex {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-top: 15px;
+        }
+
+        .botones-flex button { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar span, .menu-titulo, .logo-container { display: none; }
+            .main-content { margin-left: 70px; }
+        }
