@@ -748,4 +748,78 @@
             `).join('');
         }
 
-        function lanzarPeli(url, titulo)
+        function lanzarPeli(url, titulo) {
+            isError = false;
+            video.src = url;
+            document.getElementById('peli-title-display').innerText = titulo.split('<br>')[0].trim();
+            playerBox.style.display = 'flex';
+            statusMsg.style.display = 'block';
+            video.load();
+            resetUI();
+            
+            // Forzar pantalla completa al iniciar
+            if (playerBox.requestFullscreen) playerBox.requestFullscreen();
+        }
+
+        // TIEMPO
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        }
+
+        video.onloadedmetadata = () => document.getElementById('total-duration').innerText = formatTime(video.duration);
+        video.ontimeupdate = () => {
+            document.getElementById('current-time').innerText = formatTime(video.currentTime);
+            document.getElementById('seek-bar').value = (video.currentTime / video.duration) * 100;
+        };
+
+        // UI 10 SEGUNDOS
+        function resetUI() {
+            if(isError) return;
+            playerBox.classList.add('show-ui');
+            playerBox.style.cursor = 'default';
+            clearTimeout(uiTimer);
+            uiTimer = setTimeout(() => { 
+                if (!video.paused) {
+                    playerBox.classList.remove('show-ui');
+                    playerBox.style.cursor = 'none'; // Ocultar cursor en 65"
+                }
+            }, 10000); // 10 SEGUNDOS EXACTOS
+        }
+
+        playerBox.onmousemove = resetUI;
+        playerBox.onclick = resetUI;
+
+        document.getElementById('close-peli').onclick = () => {
+            video.pause(); video.src = "";
+            playerBox.style.display = 'none';
+            if (document.fullscreenElement) document.exitFullscreen();
+        };
+
+        const btnPlay = document.getElementById('master-play');
+        btnPlay.onclick = () => {
+            if (video.paused) { video.play(); btnPlay.innerHTML = '<i class="fas fa-pause"></i>'; }
+            else { video.pause(); btnPlay.innerHTML = '<i class="fas fa-play"></i>'; playerBox.classList.add('show-ui'); }
+        };
+
+        document.getElementById('btn-fullscreen').onclick = () => {
+            if (!document.fullscreenElement) playerBox.requestFullscreen();
+            else document.exitFullscreen();
+        };
+
+        video.oncanplay = () => { statusMsg.style.display = 'none'; video.play(); };
+        video.onerror = () => {
+            isError = true;
+            document.getElementById('txt-status').innerText = "ARCHIVO NO DISPONIBLE";
+            playerBox.classList.add('show-ui');
+        };
+
+        document.getElementById('seek-bar').oninput = function() {
+            video.currentTime = (this.value * video.duration) / 100;
+        };
+
+        mostrarPelis('Todos');
+    </script>
+</body>
+</html>
