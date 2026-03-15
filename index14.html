@@ -2,227 +2,127 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rockola Premium 14.3</title>	
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rockola Premium</title>	
     
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         :root {
-            --primary: #e50914; /* Rojo Rockola/Netflix */
+            --primary: #e50914;
             --bg: #050505;
-            --sidebar-bg: #111111;
-            --text: #ffffff;
             --sidebar-width: 320px;
-            /* Variables Plyr */
-            --plyr-color-main: var(--primary);
-            --plyr-video-control-background-hover: rgba(229, 9, 20, 0.3);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        
-        body { 
-            background-color: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            width: 100vw; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: white; display: flex; width: 100vw; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR & SCROLLBAR --- */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
-            background: var(--sidebar-bg);
+            background: #111;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             border-right: 1px solid #222;
-            z-index: 10;
-            overflow-y: auto; /* Habilitar scroll */
-            overflow-x: hidden;
+            z-index: 100; /* Prioridad alta */
+            overflow-y: auto;
         }
-
-        /* SCROLLBAR PERSONALIZADO PARA EL MENÚ */
         .sidebar::-webkit-scrollbar { width: 8px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { 
-            background: #333; 
-            border-radius: 10px; 
-            border: 2px solid var(--sidebar-bg);
-        }
-        .sidebar::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-        .logo { 
-            padding: 40px 20px; 
-            font-size: 28px; 
-            font-weight: 900; 
-            color: var(--primary); 
-            text-align: center; 
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
 
         .categoria-item {
-            padding: 22px 30px; 
-            cursor: pointer; 
-            color: #888; 
-            font-size: 19px;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            transition: 0.3s;
+            padding: 22px 30px; cursor: pointer; color: #888; font-size: 20px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .categoria-item:hover, .categoria-item.activa { 
-            color: white; 
-            background: rgba(229, 9, 20, 0.1); 
-            border-left: 6px solid var(--primary); 
-        }
-        .cat-count {
-            font-size: 14px;
-            background: rgba(255,255,255,0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            color: #666;
-        }
-        .categoria-item.activa .cat-count { color: var(--primary); background: rgba(229, 9, 20, 0.2); }
+        .categoria-item.activa { color: white; background: rgba(229, 9, 20, 0.2); border-left: 6px solid var(--primary); }
 
-        /* --- GRILLA DE PELÍCULAS --- */
-        .main-content {
-            flex-grow: 1;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 60px;
-            background: var(--bg);
+        /* --- CONTENIDO --- */
+        .main-content { flex-grow: 1; padding: 50px; overflow-y: auto; z-index: 10; }
+        .rejilla { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 30px; 
+            min-height: 100px; /* Evita colapso en 65" */
         }
-        .rejilla {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 40px;
-        }
-        .peli-card { 
-            background: #151515; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            cursor: pointer; 
-            transition: 0.4s ease;
-            border: 1px solid #222;
-        }
-        .peli-card:hover { 
-            transform: scale(1.08); 
-            border-color: var(--primary);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
-        }
-        .peli-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        .peli-info { padding: 20px; text-align: center; font-weight: 600; font-size: 16px; }
+        .peli-card { background: #1a1a1a; border-radius: 12px; cursor: pointer; transition: 0.3s; overflow: hidden; border: 1px solid #333; }
+        .peli-card:hover { transform: scale(1.05); border-color: var(--primary); }
+        .peli-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
 
-        /* --- REPRODUCTOR (OBLIGADO FULLSCREEN) --- */
+        /* --- REPRODUCTOR (EL GRAN CAMBIO) --- */
         #player-container {
             position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: #000;
-            z-index: 99999;
-            display: none; /* Se activa al elegir peli */
-        }
-
-        /* Overlay para la X y el Título */
-        .custom-controls-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 100;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.8) 100%);
-        }
-        .show-ui .custom-controls-overlay { opacity: 1; pointer-events: auto; }
-
-        /* Botón X - Tamaño TV 65" */
-        .btn-x {
-            position: absolute;
-            top: 50px;
-            right: 50px;
-            width: 85px;
-            height: 85px;
-            background: rgba(0,0,0,0.6);
-            border: 3px solid rgba(255,255,255,0.3);
-            color: white;
-            border-radius: 50%;
-            font-size: 40px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-        }
-        .btn-x:hover { background: var(--primary); border-color: var(--primary); transform: scale(1.1); }
-
-        .peli-title-overlay {
-            position: absolute;
-            bottom: 130px;
-            left: 60px;
-            font-size: 32px;
-            font-weight: 800;
-            color: white;
-            text-shadow: 3px 3px 15px rgba(0,0,0,1);
-            border-left: 6px solid var(--primary);
-            padding-left: 25px;
-        }
-
-        /* Mensaje de Error */
-        #error-msg {
-            position: absolute;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(10,10,10,0.95);
-            padding: 50px;
-            border-radius: 20px;
-            border: 2px solid var(--primary);
-            text-align: center;
-            z-index: 1000;
+            z-index: 999999 !important; /* Capa máxima absoluta */
             display: none;
         }
 
-        /* Forzar Plyr a ocupar todo el contenedor */
-        .plyr { height: 100%; width: 100%; }
-        .plyr__controls { padding: 40px 60px !important; }
+        /* Overlay superior (X y Título) - SIEMPRE ENCIMA */
+        .top-ui {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 2147483647 !important; /* El máximo z-index posible en navegadores */
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .show-ui .top-ui { opacity: 1; }
 
+        .btn-x {
+            width: 90px; height: 90px;
+            background: var(--primary);
+            color: white; border: none; border-radius: 50%;
+            font-size: 45px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: auto; /* IMPORTANTE */
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .peli-title-float {
+            font-size: 35px; font-weight: bold; color: white;
+            text-shadow: 2px 2px 15px rgba(0,0,0,1);
+            background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px;
+        }
+
+        /* Ajustes de Plyr para evitar secuestro de la TV */
+        .plyr { height: 100% !important; background: #000; }
+        .plyr__video-wrapper { height: 100%; }
+        
+        /* Ocultar cursor en TV después de inactividad */
+        .hide-cursor { cursor: none !important; }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <div class="logo">Rockola Premium <h6>14.3</h6></div>
+        <div style="padding:40px; text-align:center; color:var(--primary); font-weight:900; font-size:28px;">Rockola Premium <h6>14.4</h6></div>
         <ul id="menu-cats"></ul>
     </nav>
 
     <main class="main-content">
-        <h1 id="seccion-txt" style="margin-bottom: 40px; font-size: 36px;">Cargando...</h1>
+        <h1 id="seccion-txt" style="margin-bottom: 40px; font-size: 38px;">Catálogo</h1>
         <div class="rejilla" id="peli-grid"></div>
     </main>
 
     <div id="player-container">
-        <div id="error-msg">
-            <i class="fas fa-exclamation-triangle" style="font-size: 70px; color: var(--primary); margin-bottom: 25px;"></i>
-            <h2 style="font-size: 30px;">¡Vaya! Enlace caído</h2>
-            <p style="margin-top: 15px; color: #aaa; font-size: 20px;">Esta película no se encuentra en línea actualmente.</p>
-        </div>
-
-        <div class="custom-controls-overlay">
+        <div class="top-ui">
+            <div class="peli-title-float" id="peli-title-display"></div>
             <button class="btn-x" id="close-peli"><i class="fas fa-times"></i></button>
-            <div class="peli-title-overlay" id="peli-title-display"></div>
         </div>
-
-        <video id="player" playsinline controls></video>
+        <video id="player" playsinline></video>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
-
     <script>
-        // --- BASE DE DATOS ---
+        // DATOS
 		const movies = [
 		
 		 <!-- ********** INFANTIL VARIOS    ****************************************************************************************************************** -->		  		
@@ -793,102 +693,79 @@
 		  
 		];
 
-        // --- INICIALIZAR PLYR ---
+        // CONFIGURACIÓN PLYR (MODO TV SEGURA)
         const player = new Plyr('#player', {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-            hideControls: true, // Se maneja con nuestra lógica de 10s
+            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume'],
+            fullscreen: { enabled: false } // DESACTIVADO para evitar que la TV oculte el HTML
         });
 
-        const grid = document.getElementById('peli-grid');
         const container = document.getElementById('player-container');
-        const errorBox = document.getElementById('error-msg');
         let uiTimer;
 
-        // --- GENERAR CATEGORÍAS ---
-        const categorias = ['Todos', ...new Set(movies.map(m => m.cat))];
-        categorias.forEach(c => {
-            const num = c === 'Todos' ? movies.length : movies.filter(m => m.cat === c).length;
-            const li = document.createElement('li');
-            li.className = `categoria-item ${c === 'Todos' ? 'activa' : ''}`;
-            li.innerHTML = `<span>${c}</span><span class="cat-count">${num}</span>`;
-            li.onclick = () => {
-                document.querySelectorAll('.categoria-item').forEach(i => i.classList.remove('activa'));
-                li.classList.add('activa');
-                mostrarPelis(c);
-            };
-            document.getElementById('menu-cats').appendChild(li);
-        });
+        // CARGA SEGURA PARA TV DE 65"
+        window.onload = () => {
+            const cats = ['Todos', ...new Set(movies.map(m => m.cat))];
+            const menu = document.getElementById('menu-cats');
+            
+            cats.forEach(c => {
+                const li = document.createElement('li');
+                li.className = `categoria-item ${c === 'Todos' ? 'activa' : ''}`;
+                li.innerHTML = `<span>${c}</span> <span style="opacity:0.4">${c==='Todos'?movies.length:movies.filter(m=>m.cat===c).length}</span>`;
+                li.onclick = () => {
+                    document.querySelectorAll('.categoria-item').forEach(i => i.classList.remove('activa'));
+                    li.classList.add('activa');
+                    renderGrid(c);
+                };
+                menu.appendChild(li);
+            });
+            renderGrid('Todos');
+        };
 
-        // --- MOSTRAR PELIS ---
-        function mostrarPelis(cat) {
-            document.getElementById('seccion-txt').innerText = cat;
-            const filtradas = cat === 'Todos' ? movies : movies.filter(m => m.cat === cat);
-            grid.innerHTML = filtradas.map(p => `
+        function renderGrid(cat) {
+            const grid = document.getElementById('peli-grid');
+            const filtered = cat === 'Todos' ? movies : movies.filter(m => m.cat === cat);
+            grid.innerHTML = filtered.map(p => `
                 <div class="peli-card" onclick="lanzarPeli('${p.url}', '${p.title}')">
                     <img src="${p.thumb}">
-                    <div class="peli-info">${p.title}</div>
+                    <div style="padding:15px; text-align:center;">${p.title}</div>
                 </div>
             `).join('');
         }
 
-        // --- LANZAR REPRODUCTOR ---
         function lanzarPeli(url, titulo) {
-            errorBox.style.display = 'none';
             container.style.display = 'block';
-            
-            // Título limpio (antes del <br>)
             document.getElementById('peli-title-display').innerText = titulo.split('<br>')[0].trim();
-
+            
             player.source = { type: 'video', sources: [{ src: url, type: 'video/mp4' }] };
-
-            // Fullscreen al CONTENEDOR (Para no perder la X)
-            if (container.requestFullscreen) container.requestFullscreen();
-            else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
-
             player.play();
+            
+            // Simular Fullscreen sin usar la API del navegador (para no perder la X)
+            document.body.classList.add('hide-cursor');
             resetUI();
-
-            // Validación de Error de Red
-            const v = document.querySelector('video');
-            v.onerror = () => {
-                errorBox.style.display = 'block';
-                container.classList.add('show-ui');
-            };
         }
 
-        // --- LÓGICA DE UI (10 SEGUNDOS) ---
         function resetUI() {
             container.classList.add('show-ui');
-            document.body.style.cursor = 'default';
+            document.body.classList.remove('hide-cursor');
             clearTimeout(uiTimer);
-            
             uiTimer = setTimeout(() => {
                 if (player.playing) {
                     container.classList.remove('show-ui');
-                    document.body.style.cursor = 'none'; // Ocultar puntero en TV
+                    document.body.classList.add('hide-cursor');
                 }
             }, 10000);
         }
 
-        // Eventos para mostrar controles
         container.onmousemove = resetUI;
         container.onclick = resetUI;
-        player.on('pause', () => { container.classList.add('show-ui'); clearTimeout(uiTimer); });
-        player.on('play', resetUI);
 
-        // --- CERRAR ---
         document.getElementById('close-peli').onclick = (e) => {
+            e.preventDefault();
             e.stopPropagation();
             player.stop();
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            }
             container.style.display = 'none';
+            document.body.classList.remove('hide-cursor');
         };
-
-        // Iniciar App
-        mostrarPelis('Todos');
     </script>
 </body>
 </html>
