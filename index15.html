@@ -664,7 +664,7 @@
         if (player) { player.destroy(); }
         target.innerHTML = '';
         container.style.display = 'block';
-        document.getElementById('peli-title-display').innerText = titulo;
+        document.getElementById('peli-title-display').innerText = titulo.split('<br>')[0].trim();
 
         const ytID = getYoutubeID(url);
         
